@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     double longitude;
     double latitude;
     WeatherInfo weatherInfo;
+    TrafficInfo trafficInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,9 +60,11 @@ public class MainActivity extends AppCompatActivity {
                     latitude = gps .getLatitude();
 
                     Log.w("coord -> ", "Latitude ->" + latitude + " Longitude -> " + longitude);
-                    Toast.makeText(getApplicationContext(),"Longitude:"+Double.toString(longitude)+"\nLatitude:"+Double.toString(latitude),Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),"Longitude:"+Double.toString(longitude)+"\nLatitude:"+Double.toString(latitude),Toast.LENGTH_SHORT).show();
 
                     new WeatherResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
+
+                    new TrafficResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
                 }
                 else
                 {

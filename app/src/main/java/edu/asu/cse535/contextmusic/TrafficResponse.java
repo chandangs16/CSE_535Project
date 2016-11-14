@@ -1,9 +1,5 @@
 package edu.asu.cse535.contextmusic;
 
-/**
- * Created by Shashank on 11/11/2016.
- */
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -16,25 +12,36 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
-
-/*
-The Response class extends an AsyncTask class in order to process an asynchronus thread in the background
-of the main UI thread. Here we fetch the OMDB API response and instantiate a MovieDescription object with
- a string argument of the JSON Object order to retrieve the fields of the JSON response.
+/**
+ * Created by Shashank on 11/13/2016.
  */
-public class WeatherResponse extends AsyncTask<String, String, String> {
+
+public class TrafficResponse extends AsyncTask<String, String, String> {
 
     public MainActivity someActivity;
     public double latitude;
     public double longitude;
     public Context context;
+    private double lat1;
+    private double lon1;
+    private double lat2;
+    private double lon2;
+    private double latlen = 111111;
 
-    WeatherResponse(MainActivity someActivity, double latitude, double longitude, Context context) {
+    TrafficResponse(MainActivity someActivity, double latitude, double longitude, Context context) {
         this.someActivity = someActivity;
         this.latitude = latitude;
         this.longitude = longitude;
         this.context = context;
+        calculateBounds(33.424564, -111.928001);
+
+    }
+
+    private void calculateBounds(double latitude, double longitude) {
+        this.lat1 = Math.round(50/latlen * 100000)/100000 + latitude;
+        this.lat2 = latitude - Math.round(50/latlen * 100000)/ 100000;
+        this.lon1 = (Math.round(50/latlen * 100000)/100000 * Math.cos(latitude)) + longitude;
+        this.lon2 = longitude - (Math.round(50/latlen * 100000)/100000 * Math.cos(latitude));
     }
 
     @Override
@@ -44,7 +51,9 @@ public class WeatherResponse extends AsyncTask<String, String, String> {
         String jsonString = "";
 
         try {
-            URL url = new URL("http://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=845af45e3631fb03e93342ab8d2f7b4c");
+
+
+            URL url = new URL("https://traffic.cit.api.here.com/traffic/6.2/flow.json?app_id=kRkwWeUfBKWLAfy2xre2&app_code=GoAwRFobZ2qCmvKYM6jJvg&bbox="+this.lat1+","+this.lon1+";"+this.lat2+","+this.lon2);
             connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             InputStream inputStream = connection.getInputStream();
@@ -82,10 +91,8 @@ public class WeatherResponse extends AsyncTask<String, String, String> {
     protected void onPostExecute(String strJsonObj) {
 
         super.onPostExecute(strJsonObj);
-        this.someActivity.weatherInfo = new WeatherInfo(strJsonObj);
-        System.out.println(this.someActivity.weatherInfo.toJsonString());
-        Toast.makeText(context, "Weather: " + this.someActivity.weatherInfo.weather.toString(), Toast.LENGTH_SHORT).show();
+        this.someActivity.trafficInfo = new TrafficInfo(strJsonObj);
+        System.out.println(this.someActivity.trafficInfo.toJsonString());
+        Toast.makeText(context, "Traffic: " + this.someActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
     }
-
 }
-
