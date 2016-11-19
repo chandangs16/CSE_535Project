@@ -39,7 +39,6 @@ public class TrafficInfo {
                 }
             }
 
-
             if(jamFactor <= 50) {
                 traffic = "free road";
             }

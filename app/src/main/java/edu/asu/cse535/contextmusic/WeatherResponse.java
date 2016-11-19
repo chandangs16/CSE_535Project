@@ -16,8 +16,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
-
 /*
 The Response class extends an AsyncTask class in order to process an asynchronus thread in the background
 of the main UI thread. Here we fetch the OMDB API response and instantiate a MovieDescription object with
@@ -75,12 +73,10 @@ public class WeatherResponse extends AsyncTask<String, String, String> {
             }
         }
         return jsonString;
-
     }
 
     @Override
     protected void onPostExecute(String strJsonObj) {
-
         super.onPostExecute(strJsonObj);
         this.someActivity.weatherInfo = new WeatherInfo(strJsonObj);
         System.out.println(this.someActivity.weatherInfo.toJsonString());

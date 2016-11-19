@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:text="Prompting Emotion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/emotion_info"
+        android:layout_weight="0.04"
+        android:textSize="30sp"
+        android:textAlignment="center" />
+
+    <Button
+        android:text="I'm Feeling Wonderful"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_wonderful"
+        android:layout_weight="0.04"
+        android:textSize="24sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <Button
+        android:text="I'm Feeling Happy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_happy"
+        android:layout_weight="0.04"
+        android:elevation="24dp"
+        android:textAlignment="center"
+        android:textSize="24sp" />
+
+    <Button
+        android:text="I'm Sad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_sad"
+        android:layout_weight="0.04"
+        android:textSize="24sp" />
+</LinearLayout>

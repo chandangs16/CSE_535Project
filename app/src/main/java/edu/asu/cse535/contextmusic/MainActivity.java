@@ -1,27 +1,7 @@
 package edu.asu.cse535.contextmusic;
 
-/*import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.app.Activity;
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.widget.TextView;
-
-import android.util.Log;
-
-public class MainActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
-}*/
-
-
-
+import android.app.Service;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +12,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button b_get;
+    private Button b_get, b_emo;
     private TrackGPS gps;
     double longitude;
     double latitude;
@@ -42,9 +22,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         b_get = (Button)findViewById(R.id.get_Loc);
-
-
 
         b_get.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
                 gps = new TrackGPS(MainActivity.this);
 
 
+                Toast.makeText(MainActivity.this, "listener", Toast.LENGTH_SHORT).show();
                 if(gps.canGetLocation()){
-
-
+                    Toast.makeText(MainActivity.this, "inside if", Toast.LENGTH_SHORT).show();
                     longitude = gps.getLongitude();
                     latitude = gps .getLatitude();
 
@@ -63,14 +42,22 @@ public class MainActivity extends AppCompatActivity {
                     //Toast.makeText(getApplicationContext(),"Longitude:"+Double.toString(longitude)+"\nLatitude:"+Double.toString(latitude),Toast.LENGTH_SHORT).show();
 
                     new WeatherResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
-
                     new TrafficResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
                 }
                 else
                 {
-
+                    Log.w("gps: ","in else part");
                     gps.showSettingsAlert();
                 }
+            }
+        });
+
+        b_emo = (Button)findViewById(R.id.get_Emo);
+
+        b_emo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
 
             }
         });
@@ -81,7 +68,4 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         gps.stopUsingGPS();
     }
-
-
 }
-
