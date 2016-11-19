@@ -22,6 +22,8 @@ import android.provider.Settings;
 
 
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ServiceCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ public class TrackGPS extends Service implements LocationListener {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
     protected LocationManager locationManager;
+    private String provider_info;
 
     public TrackGPS() {
         mContext = this;
@@ -74,10 +77,10 @@ public class TrackGPS extends Service implements LocationListener {
                 // First get location from Network Provider
                 if (checkNetwork) {
                     //Toast.makeText(mContext, "Network", Toast.LENGTH_SHORT).show();
-
+                    provider_info = LocationManager.NETWORK_PROVIDER;
                     try {
                         locationManager.requestLocationUpdates(
-                                LocationManager.NETWORK_PROVIDER,
+                                provider_info,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         Log.d("Network", "Network");
@@ -98,11 +101,14 @@ public class TrackGPS extends Service implements LocationListener {
             }
             // if GPS Enabled get lat/long using GPS Services
             if (checkGPS) {
-               // Toast.makeText(mContext, "GPS", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(mContext, "GPS", Toast.LENGTH_SHORT).show();
+                provider_info = LocationManager.GPS_PROVIDER;
                 if (loc == null) {
                     try {
+
+
                         locationManager.requestLocationUpdates(
-                                LocationManager.GPS_PROVIDER,
+                                provider_info,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         Log.d("GPS Enabled", "GPS Enabled");
@@ -114,8 +120,8 @@ public class TrackGPS extends Service implements LocationListener {
                                 longitude = loc.getLongitude();
                             }
                         }
-                    } catch (SecurityException e) {
-
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
