@@ -19,15 +19,25 @@
 package edu.asu.cse535.contextmusic;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This Class is used to initialize Database for the Application.
@@ -140,6 +150,47 @@ public class DatabaseController extends SQLiteOpenHelper {
         return ret;
     }
 
+
+    public ArrayList<String> queryDatabaseController(String queryType, String params) {
+        ArrayList<String> songList = new ArrayList<String>();
+        String query;
+        switch(queryType){
+            case "weather":
+                query = "select m.title from music m, context c where m.itemid = c.itemid and c.weather = ?;";
+                break;
+            case "traffic":
+                query = "select m.title from music m, context c where m.itemid = c.itemid and c.trafficconditions = ?;";
+                break;
+            case "emotion":
+                query = "select m.title from music m, context c where m.itemid = c.itemid and c.mood= ? ;";
+                break;
+            default:
+                query = "";
+                break;
+
+        }
+
+        try {
+            SQLiteDatabase modelDb = this.openDB();
+            Cursor cursor = modelDb.rawQuery(query,new String[]{ params});
+            while(cursor.moveToNext()) {
+                String songName = cursor.getString(0);
+                songList.add(songName);
+
+                // Logic to play the music player.
+                // MPI for ArrayList
+
+            }
+
+
+            this.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return songList;
+    }
+
     // Default Override Methods
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -164,4 +215,152 @@ public class DatabaseController extends SQLiteOpenHelper {
             android.util.Log.d(hdr,msg);
         }
     }
+
+
+    public class WeatherResponse extends AsyncTask<String, String, String> {
+
+        public double latitude;
+        public double longitude;
+        public Context context;
+
+        WeatherResponse( double latitude, double longitude, Context context) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.context = context;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection connection = null;
+            BufferedReader buffReader = null;
+            String jsonString = "";
+
+            try {
+                URL url = new URL("http://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=845af45e3631fb03e93342ab8d2f7b4c");
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                InputStream inputStream = connection.getInputStream();
+                buffReader = new BufferedReader(new InputStreamReader(inputStream));
+
+                StringBuffer strBuff = new StringBuffer();
+                String strLine = "";
+                while ((strLine = buffReader.readLine()) != null) {
+                    strBuff.append(strLine);
+                }
+
+                jsonString = strBuff.toString();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (buffReader != null) {
+                        buffReader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return jsonString;
+        }
+
+        @Override
+        protected void onPostExecute(String strJsonObj) {
+            super.onPostExecute(strJsonObj);
+            WeatherInfo weatherInfo = new WeatherInfo(strJsonObj);
+            String weatherQuery = "weather";
+            String weatherParam = weatherInfo.weather;
+            queryDatabaseController(weatherQuery, weatherParam);
+
+
+        }
+
+    }
+
+    public class TrafficResponse extends AsyncTask<String, String, String> {
+
+        public double latitude;
+        public double longitude;
+        public Context context;
+        private double lat1;
+        private double lon1;
+        private double lat2;
+        private double lon2;
+        private double latlen = 111111;
+
+        TrafficResponse(double latitude, double longitude, Context context) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.context = context;
+            calculateBounds(33.424564, -111.928001);
+
+        }
+
+        private void calculateBounds(double latitude, double longitude) {
+            this.lat1 = Math.round(50/latlen * 100000)/100000 + latitude;
+            this.lat2 = latitude - Math.round(50/latlen * 100000)/ 100000;
+            this.lon1 = (Math.round(50/latlen * 100000)/100000 * Math.cos(latitude)) + longitude;
+            this.lon2 = longitude - (Math.round(50/latlen * 100000)/100000 * Math.cos(latitude));
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection connection = null;
+            BufferedReader buffReader = null;
+            String jsonString = "";
+
+            try {
+
+
+                URL url = new URL("https://traffic.cit.api.here.com/traffic/6.2/flow.json?app_id=kRkwWeUfBKWLAfy2xre2&app_code=GoAwRFobZ2qCmvKYM6jJvg&bbox="+this.lat1+","+this.lon1+";"+this.lat2+","+this.lon2);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                InputStream inputStream = connection.getInputStream();
+                buffReader = new BufferedReader(new InputStreamReader(inputStream));
+
+                StringBuffer strBuff = new StringBuffer();
+                String strLine = "";
+                while ((strLine = buffReader.readLine()) != null) {
+                    strBuff.append(strLine);
+                }
+
+                jsonString = strBuff.toString();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (buffReader != null) {
+                        buffReader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return jsonString;
+
+        }
+
+        @Override
+        protected void onPostExecute(String strJsonObj) {
+
+            super.onPostExecute(strJsonObj);
+            TrafficInfo trafficInfo = new TrafficInfo(strJsonObj);
+            String trafficQuery = "traffic";
+            String trafficParam = trafficInfo.traffic;
+            queryDatabaseController(trafficQuery, trafficParam);
+
+        }
+    }
+
 }
