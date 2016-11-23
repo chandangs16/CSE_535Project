@@ -23,6 +23,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -37,7 +40,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * This Class is used to initialize Database for the Application.
@@ -51,13 +54,43 @@ public class DatabaseController extends SQLiteOpenHelper {
     private String dbPath;
     private SQLiteDatabase modelDB;
     private final Context dbContext;
+    private MainActivity parentActivity;
+    public ConcurrentLinkedQueue<String> musicFiles = new ConcurrentLinkedQueue<String>();
+
+    double longitude;
+    double latitude;
+
+
+//    public Handler databaseHandler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            Toast.makeText(parentActivity, "Call for Handler Function",Toast.LENGTH_SHORT).show();
+//        }
+//    };
+
+    public Handler databaseHandler = new Handler();
+    public Runnable addMusicDataToQueue = new Runnable() {
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            Log.v("Thread -Check", "Running the Thread - Sohan");
+            musicFiles.add("FirstFile");
+            musicFiles.add("SecondFile");
+        }
+    };
 
     // Constructors
-    public DatabaseController(Context context) {
+    public DatabaseController(MainActivity parentActivity, Context context) {
         super(context, dbName, null, DATABASE_VERSION);
+
         dbContext = context;
         dbPath = context.getFilesDir().getPath()+"/";
         android.util.Log.d(this.getClass().getSimpleName(),"dbpath: " + dbPath);
+
+        this.parentActivity = parentActivity;
+
+        new WeatherResponse(latitude, longitude, parentActivity.getApplicationContext()).execute();
+        new TrafficResponse(latitude, longitude, parentActivity.getApplicationContext()).execute();
     }
 
     /**
@@ -152,7 +185,7 @@ public class DatabaseController extends SQLiteOpenHelper {
 
 
     public ArrayList<String> queryDatabaseController(String queryType, String params) {
-        ArrayList<String> songList = new ArrayList<String>();
+//        ArrayList<String> songList = new ArrayList<String>();
         String query;
         switch(queryType){
             case "weather":
@@ -177,12 +210,11 @@ public class DatabaseController extends SQLiteOpenHelper {
                 String songName = cursor.getString(0);
                 songList.add(songName);
 
+
                 // Logic to play the music player.
                 // MPI for ArrayList
 
             }
-
-
             this.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -215,7 +247,6 @@ public class DatabaseController extends SQLiteOpenHelper {
             android.util.Log.d(hdr,msg);
         }
     }
-
 
     public class WeatherResponse extends AsyncTask<String, String, String> {
 
@@ -276,8 +307,6 @@ public class DatabaseController extends SQLiteOpenHelper {
             String weatherQuery = "weather";
             String weatherParam = weatherInfo.weather;
             queryDatabaseController(weatherQuery, weatherParam);
-
-
         }
 
     }
@@ -315,8 +344,6 @@ public class DatabaseController extends SQLiteOpenHelper {
             String jsonString = "";
 
             try {
-
-
                 URL url = new URL("https://traffic.cit.api.here.com/traffic/6.2/flow.json?app_id=kRkwWeUfBKWLAfy2xre2&app_code=GoAwRFobZ2qCmvKYM6jJvg&bbox="+this.lat1+","+this.lon1+";"+this.lat2+","+this.lon2);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
@@ -353,13 +380,12 @@ public class DatabaseController extends SQLiteOpenHelper {
 
         @Override
         protected void onPostExecute(String strJsonObj) {
-
             super.onPostExecute(strJsonObj);
             TrafficInfo trafficInfo = new TrafficInfo(strJsonObj);
             String trafficQuery = "traffic";
             String trafficParam = trafficInfo.traffic;
             queryDatabaseController(trafficQuery, trafficParam);
-
+            DatabaseController.this.databaseHandler.post(DatabaseController.this.addMusicDataToQueue);
         }
     }
 

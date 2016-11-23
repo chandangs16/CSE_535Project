@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +17,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import java.sql.SQLException;
 
 
@@ -28,31 +29,37 @@ public class MainActivity extends AppCompatActivity {
     WeatherInfo weatherInfo;
     TrafficInfo trafficInfo;
 
+    public DatabaseController dbController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setPermissions();
+
+        dbController = new DatabaseController(MainActivity.this, getApplicationContext());
 
         b_get = (Button)findViewById(R.id.get_Loc);
         b_get.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                // Start GPS Service.
                 gps = new TrackGPS(MainActivity.this);
-
-
                 Toast.makeText(MainActivity.this, "listener", Toast.LENGTH_SHORT).show();
+
                 if(gps.canGetLocation()){
                     Toast.makeText(MainActivity.this, "inside if", Toast.LENGTH_SHORT).show();
                     longitude = gps.getLongitude();
                     latitude = gps .getLatitude();
 
                     Log.w("coord -> ", "Latitude ->" + latitude + " Longitude -> " + longitude);
-                    Toast.makeText(getApplicationContext(),"Longitude:"+Double.toString(longitude)+"\nLatitude:"+Double.toString(latitude),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Longitude:"+Double.toString(longitude) + "\nLatitude:"+Double.toString(latitude),Toast.LENGTH_SHORT).show();
 
+                    // Start Weather Response Service.
                     new WeatherResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
+
+                    // Start Traffic response Service.
                     new TrafficResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
                 }
                 else
@@ -67,41 +74,16 @@ public class MainActivity extends AppCompatActivity {
         b_emo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                    // Set the Code for Emotion Prompt.
 
             }
         });
-
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         gps.stopUsingGPS();
-    }
-
-    void queryDatabaseController() {
-        DatabaseController DatabaseControllerdb = new DatabaseController((Context)this);
-
-        String query1 = "select distinct moviegenre from movies;";
-        String query2 = "";
-        String query3 = "";
-        String query4 = "";
-
-        try {
-            SQLiteDatabase modelDb = DatabaseControllerdb.openDB();
-            Cursor cursor = modelDb.rawQuery(query1,new String[]{});
-
-            while(cursor.moveToNext()) {
-                String songName = cursor.getString(0);
-
-                // Logic to play the music player.
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     void setPermissions() {

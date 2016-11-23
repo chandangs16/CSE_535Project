@@ -18,7 +18,7 @@ import java.net.URL;
 
 public class TrafficResponse extends AsyncTask<String, String, String> {
 
-    public MainActivity someActivity;
+    public MainActivity parentActivity;
     public double latitude;
     public double longitude;
     public Context context;
@@ -29,7 +29,7 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
     private double latlen = 111111;
 
     TrafficResponse(MainActivity someActivity, double latitude, double longitude, Context context) {
-        this.someActivity = someActivity;
+        this.parentActivity = someActivity;
         this.latitude = latitude;
         this.longitude = longitude;
         this.context = context;
@@ -51,8 +51,6 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
         String jsonString = "";
 
         try {
-
-
             URL url = new URL("https://traffic.cit.api.here.com/traffic/6.2/flow.json?app_id=kRkwWeUfBKWLAfy2xre2&app_code=GoAwRFobZ2qCmvKYM6jJvg&bbox="+this.lat1+","+this.lon1+";"+this.lat2+","+this.lon2);
             connection = (HttpURLConnection) url.openConnection();
             connection.connect();
@@ -89,10 +87,10 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String strJsonObj) {
-
+        // Initial Code.
         super.onPostExecute(strJsonObj);
-        this.someActivity.trafficInfo = new TrafficInfo(strJsonObj);
-        System.out.println(this.someActivity.trafficInfo.toJsonString());
-        Toast.makeText(context, "Traffic: " + this.someActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
+        this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
+        System.out.println(this.parentActivity.trafficInfo.toJsonString());
+        Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
     }
 }

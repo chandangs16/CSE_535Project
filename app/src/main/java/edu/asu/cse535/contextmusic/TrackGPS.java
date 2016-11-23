@@ -79,15 +79,11 @@ public class TrackGPS extends Service implements LocationListener {
                     //Toast.makeText(mContext, "Network", Toast.LENGTH_SHORT).show();
                     provider_info = LocationManager.NETWORK_PROVIDER;
                     try {
-                        locationManager.requestLocationUpdates(
-                                provider_info,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        locationManager.requestLocationUpdates(provider_info, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
                         Log.d("Network", "Network");
                         if (locationManager != null) {
-                            loc = locationManager
-                                    .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
+                            loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         }
 
                         if (loc != null) {
@@ -105,16 +101,11 @@ public class TrackGPS extends Service implements LocationListener {
                 provider_info = LocationManager.GPS_PROVIDER;
                 if (loc == null) {
                     try {
-
-
-                        locationManager.requestLocationUpdates(
-                                provider_info,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        locationManager.requestLocationUpdates(provider_info,  MIN_TIME_BW_UPDATES,  MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         Log.d("GPS Enabled", "GPS Enabled");
+
                         if (locationManager != null) {
-                            loc = locationManager
-                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             if (loc != null) {
                                 latitude = loc.getLatitude();
                                 longitude = loc.getLongitude();
@@ -153,13 +144,8 @@ public class TrackGPS extends Service implements LocationListener {
 
     public void showSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-
-
         alertDialog.setTitle("GPS Not Enabled");
-
         alertDialog.setMessage("Do you wants to turn On GPS");
-
-
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -167,13 +153,11 @@ public class TrackGPS extends Service implements LocationListener {
             }
         });
 
-
         alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });
-
 
         alertDialog.show();
     }
