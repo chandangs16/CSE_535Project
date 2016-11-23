@@ -74,8 +74,8 @@ public class DatabaseController extends SQLiteOpenHelper {
         public void run() {
             // TODO Auto-generated method stub
             Log.v("Thread -Check", "Running the Thread - Sohan");
-            musicFiles.add("FirstFile");
-            musicFiles.add("SecondFile");
+            //musicFiles.add("FirstFile");
+            //musicFiles.add("SecondFile");
         }
     };
 
@@ -208,7 +208,7 @@ public class DatabaseController extends SQLiteOpenHelper {
             Cursor cursor = modelDb.rawQuery(query,new String[]{ params});
             while(cursor.moveToNext()) {
                 String songName = cursor.getString(0);
-                songList.add(songName);
+                musicFiles.add(songName);
 
 
                 // Logic to play the music player.
