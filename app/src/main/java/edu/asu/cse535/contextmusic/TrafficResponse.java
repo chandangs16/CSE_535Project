@@ -1,7 +1,11 @@
 package edu.asu.cse535.contextmusic;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v7.app.NotificationCompat;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -11,6 +15,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by Shashank on 11/13/2016.
@@ -89,8 +95,26 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
     protected void onPostExecute(String strJsonObj) {
         // Initial Code.
         super.onPostExecute(strJsonObj);
+<<<<<<< HEAD
         this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
         System.out.println(this.parentActivity.trafficInfo.toJsonString());
         Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
+=======
+        this.someActivity.trafficInfo = new TrafficInfo(strJsonObj);
+        System.out.println(this.someActivity.trafficInfo.toJsonString());
+        Toast.makeText(context, "Traffic: " + this.someActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        PendingIntent pendingIntent = PendingIntent.getActivity(someActivity,0,intent,0);
+        android.support.v4.app.NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(someActivity.getApplicationContext())
+                        .setSmallIcon(R.drawable.traffic)
+                        .setContentTitle("Traffic")
+                        .setContentText(someActivity.trafficInfo.traffic.toString().toUpperCase());
+
+        mBuilder.setContentIntent(pendingIntent);
+
+        NotificationManager nm = (NotificationManager) someActivity.getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(2, mBuilder.build());
+>>>>>>> 289d9e238b92dde976e36defa638da2fd10457db
     }
 }

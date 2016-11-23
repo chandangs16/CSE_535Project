@@ -16,6 +16,7 @@ public class WeatherInfo {
 
     public WeatherInfo(String jsonString){
         try{
+            System.out.println(jsonString);
             JSONObject jsonObject = new JSONObject(jsonString);
             JSONArray jsonArray = jsonObject.getJSONArray("weather");
 
@@ -23,7 +24,7 @@ public class WeatherInfo {
                 case "Thunderstorm" :
                     this.weather = "rainy";
                     break;
-                case "Rainy" :
+                case "Rain" :
                     this.weather = "rainy";
                     break;
                 case "Snow":
@@ -34,7 +35,10 @@ public class WeatherInfo {
                 case "Clear":
                     this.weather = "sunny";
                     break;
-                default: this.weather = null;
+                case "Fog":
+                    this.weather = "fog";
+                    break;
+                default: this.weather = "";
                     break;
             };
 

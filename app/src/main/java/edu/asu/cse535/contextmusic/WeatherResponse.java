@@ -4,8 +4,12 @@ package edu.asu.cse535.contextmusic;
  * Created by Shashank on 11/11/2016.
  */
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v7.app.NotificationCompat;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -15,6 +19,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /*
 The Response class extends an AsyncTask class in order to process an asynchronus thread in the background
@@ -81,6 +87,18 @@ public class WeatherResponse extends AsyncTask<String, String, String> {
         this.someActivity.weatherInfo = new WeatherInfo(strJsonObj);
         System.out.println(this.someActivity.weatherInfo.toJsonString());
         Toast.makeText(context, "Weather: " + this.someActivity.weatherInfo.weather.toString(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        PendingIntent pendingIntent = PendingIntent.getActivity(someActivity,0,intent,0);
+        android.support.v4.app.NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(someActivity.getApplicationContext())
+                        .setSmallIcon(R.drawable.weather)
+                        .setContentTitle("Weather")
+                        .setContentText(someActivity.weatherInfo.weather.toString().toUpperCase());
+
+        mBuilder.setContentIntent(pendingIntent);
+
+        NotificationManager nm = (NotificationManager) someActivity.getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(1, mBuilder.build());
     }
 
 }
