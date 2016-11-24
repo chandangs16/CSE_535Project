@@ -26,6 +26,10 @@
             android:name=".TrackGPS"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".SpeedometerService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

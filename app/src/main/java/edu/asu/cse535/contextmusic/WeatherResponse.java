@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -19,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -33,6 +36,8 @@ public class WeatherResponse extends AsyncTask<String, String, String> {
     public double latitude;
     public double longitude;
     public Context context;
+    Calendar c = Calendar.getInstance();
+    int hour = c.get(Calendar.HOUR_OF_DAY);
 
     WeatherResponse(MainActivity someActivity, double latitude, double longitude, Context context) {
         this.someActivity = someActivity;
@@ -99,7 +104,53 @@ public class WeatherResponse extends AsyncTask<String, String, String> {
 
         NotificationManager nm = (NotificationManager) someActivity.getSystemService(NOTIFICATION_SERVICE);
         nm.notify(1, mBuilder.build());
+
+        if (isBetween(hour, 5, 18)) {
+
+            if (this.someActivity.weatherInfo.weather.toString() == "rainy") {
+                RelativeLayout mLinearLayout = (RelativeLayout) someActivity.findViewById(R.id.activity_main);
+                mLinearLayout.setBackgroundResource(R.drawable.morning_rainy);
+            } else if (this.someActivity.weatherInfo.weather.toString() == "snowing") {
+                RelativeLayout mLinearLayout = (RelativeLayout) someActivity.findViewById(R.id.activity_main);
+                mLinearLayout.setBackgroundResource(R.drawable.morning_snowy);
+            } else if (this.someActivity.weatherInfo.weather.toString() == "cloudy") {
+                RelativeLayout mLinearLayout = (RelativeLayout) someActivity.findViewById(R.id.activity_main);
+                mLinearLayout.setBackgroundResource(R.drawable.morning_cloudy);
+            } else if (this.someActivity.weatherInfo.weather.toString() == "sunny") {
+                RelativeLayout mLinearLayout = (RelativeLayout) someActivity.findViewById(R.id.activity_main);
+                mLinearLayout.setBackgroundResource(R.drawable.morning_sunny);
+            } else {
+                RelativeLayout mLinearLayout = (RelativeLayout) someActivity.findViewById(R.id.activity_main);
+                mLinearLayout.setBackgroundResource(R.drawable.sunrise);
+            }
+        } else if (isBetween(hour, 19, 23) || isBetween(hour, 0, 5)) {
+            /*RelativeLayout mLinearLayout = (RelativeLayout) findViewById(R.id.activity_main);
+            mLinearLayout.setBackgroundResource(R.drawable.night);*/
+            try {
+                Log.w("check:", this.someActivity.weatherInfo.weather.toString());
+
+                if (this.someActivity.weatherInfo.weather == "rainy") {
+                    RelativeLayout mLinearLayout = (RelativeLayout) this.someActivity.findViewById(R.id.activity_main);
+                    mLinearLayout.setBackgroundResource(R.drawable.night_rainy);
+                } else if (this.someActivity.weatherInfo.weather.toString() == "snowing") {
+                    RelativeLayout mLinearLayout = (RelativeLayout) this.someActivity.findViewById(R.id.activity_main);
+                    mLinearLayout.setBackgroundResource(R.drawable.night_snowy);
+                } else if (this.someActivity.weatherInfo.weather.toString() == "cloudy") {
+                    RelativeLayout mLinearLayout = (RelativeLayout) this.someActivity.findViewById(R.id.activity_main);
+                    mLinearLayout.setBackgroundResource(R.drawable.night_cloudy);
+                } else {
+                    RelativeLayout mLinearLayout = (RelativeLayout) this.someActivity.findViewById(R.id.activity_main);
+                    mLinearLayout.setBackgroundResource(R.drawable.night);
+                }
+
+            } catch (NullPointerException e) {
+                Log.v("inside exception:", "sdsds");
+            }
+        }
     }
 
+        public static boolean isBetween(int x, int lower, int upper) {
+            return lower <= x && x <= upper;
+        }
 }
 

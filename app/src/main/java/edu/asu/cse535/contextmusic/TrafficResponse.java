@@ -39,7 +39,7 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
         this.latitude = latitude;
         this.longitude = longitude;
         this.context = context;
-        calculateBounds(33.424564, -111.928001);
+        calculateBounds(latitude, longitude);
 
     }
 
@@ -95,26 +95,24 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
     protected void onPostExecute(String strJsonObj) {
         // Initial Code.
         super.onPostExecute(strJsonObj);
-<<<<<<< HEAD
         this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
         System.out.println(this.parentActivity.trafficInfo.toJsonString());
         Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
-=======
-        this.someActivity.trafficInfo = new TrafficInfo(strJsonObj);
-        System.out.println(this.someActivity.trafficInfo.toJsonString());
-        Toast.makeText(context, "Traffic: " + this.someActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
+
+        this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
+        System.out.println(this.parentActivity.trafficInfo.toJsonString());
+        Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
-        PendingIntent pendingIntent = PendingIntent.getActivity(someActivity,0,intent,0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(parentActivity,0,intent,0);
         android.support.v4.app.NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(someActivity.getApplicationContext())
+                new NotificationCompat.Builder(parentActivity.getApplicationContext())
                         .setSmallIcon(R.drawable.traffic)
                         .setContentTitle("Traffic")
-                        .setContentText(someActivity.trafficInfo.traffic.toString().toUpperCase());
+                        .setContentText(parentActivity.trafficInfo.traffic.toString().toUpperCase());
 
         mBuilder.setContentIntent(pendingIntent);
 
-        NotificationManager nm = (NotificationManager) someActivity.getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) parentActivity.getSystemService(NOTIFICATION_SERVICE);
         nm.notify(2, mBuilder.build());
->>>>>>> 289d9e238b92dde976e36defa638da2fd10457db
     }
 }

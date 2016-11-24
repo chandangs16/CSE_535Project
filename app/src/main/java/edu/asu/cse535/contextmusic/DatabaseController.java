@@ -22,7 +22,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Criteria;
+import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -40,6 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -55,6 +59,8 @@ public class DatabaseController extends SQLiteOpenHelper {
     private SQLiteDatabase modelDB;
     private final Context dbContext;
     private MainActivity parentActivity;
+    private TrackGPS gps;
+    private ArrayList<String> choiceList = new ArrayList<>();
     public ConcurrentLinkedQueue<String> musicFiles = new ConcurrentLinkedQueue<String>();
 
     double longitude;
@@ -76,11 +82,16 @@ public class DatabaseController extends SQLiteOpenHelper {
             Log.v("Thread -Check", "Running the Thread - Sohan");
             //musicFiles.add("FirstFile");
             //musicFiles.add("SecondFile");
+            Random random = new Random();
+            int randomIndex = random.nextInt(choiceList.size());
+            musicFiles.add(choiceList.get(randomIndex));
+            Log.w("music queue -> " , musicFiles.peek() + "~~~~" + musicFiles.size());
+            choiceList = new ArrayList<>();
         }
     };
 
     // Constructors
-    public DatabaseController(MainActivity parentActivity, Context context) {
+    public DatabaseController(MainActivity parentActivity, Context context, TrackGPS gps) {
         super(context, dbName, null, DATABASE_VERSION);
 
         dbContext = context;
@@ -88,9 +99,9 @@ public class DatabaseController extends SQLiteOpenHelper {
         android.util.Log.d(this.getClass().getSimpleName(),"dbpath: " + dbPath);
 
         this.parentActivity = parentActivity;
-
-        new WeatherResponse(latitude, longitude, parentActivity.getApplicationContext()).execute();
-        new TrafficResponse(latitude, longitude, parentActivity.getApplicationContext()).execute();
+        this.gps = gps;
+//        new WeatherResponse(latitude, longitude).execute();
+//        new TrafficResponse(latitude, longitude).execute();
     }
 
     /**
@@ -183,32 +194,43 @@ public class DatabaseController extends SQLiteOpenHelper {
         return ret;
     }
 
+    public void addSong(double latitude, double longitude) {
+        new SpeedometerResponse(this.parentActivity, this.gps, this.parentActivity.getApplicationContext()).execute();
+        new WeatherResponse(latitude, longitude).execute();
+        new TrafficResponse(latitude, longitude).execute();
+    }
 
-    public ArrayList<String> queryDatabaseController(String queryType, String params) {
+
+
+    public void queryDatabaseController(String queryType, String params) {
 //        ArrayList<String> songList = new ArrayList<String>();
         String query;
+        Log.w("Params" , params);
         switch(queryType){
             case "weather":
-                query = "select m.title from music m, context c where m.itemid = c.itemid and c.weather = ?;";
+                query = "select m.title from music m, context c where m.itemid = c.itemid and c.weather = ? order by RANDOM() LIMIT 1;";
                 break;
             case "traffic":
-                query = "select m.title from music m, context c where m.itemid = c.itemid and c.trafficconditions = ?;";
+                query = "select m.title from music m, context c where m.itemid = c.itemid and c.trafficconditions = ? order by RANDOM() LIMIT 1;";
                 break;
             case "emotion":
-                query = "select m.title from music m, context c where m.itemid = c.itemid and c.mood= ? ;";
+                query = "select m.title from music m, context c where m.itemid = c.itemid and c.mood= ? order by RANDOM() LIMIT 1;";
+                break;
+            case "driving":
+                query = "select m.title from music m, context c where m.itemid = c.itemid and c.drivingstyle = ? order by RANDOM() LIMIT 1;";
                 break;
             default:
                 query = "";
                 break;
 
         }
-
+        Log.w("Query:", query);
         try {
             SQLiteDatabase modelDb = this.openDB();
             Cursor cursor = modelDb.rawQuery(query,new String[]{ params});
             while(cursor.moveToNext()) {
                 String songName = cursor.getString(0);
-                musicFiles.add(songName);
+                choiceList.add(songName);
 
 
                 // Logic to play the music player.
@@ -220,7 +242,6 @@ public class DatabaseController extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
-        return songList;
     }
 
     // Default Override Methods
@@ -248,16 +269,16 @@ public class DatabaseController extends SQLiteOpenHelper {
         }
     }
 
-    public class WeatherResponse extends AsyncTask<String, String, String> {
+    private class WeatherResponse extends AsyncTask<String, String, String> {
 
         public double latitude;
         public double longitude;
         public Context context;
 
-        WeatherResponse( double latitude, double longitude, Context context) {
+        WeatherResponse( double latitude, double longitude) {
             this.latitude = latitude;
             this.longitude = longitude;
-            this.context = context;
+//            this.context = context;
         }
 
         @Override
@@ -311,7 +332,7 @@ public class DatabaseController extends SQLiteOpenHelper {
 
     }
 
-    public class TrafficResponse extends AsyncTask<String, String, String> {
+    private class TrafficResponse extends AsyncTask<String, String, String> {
 
         public double latitude;
         public double longitude;
@@ -322,11 +343,11 @@ public class DatabaseController extends SQLiteOpenHelper {
         private double lon2;
         private double latlen = 111111;
 
-        TrafficResponse(double latitude, double longitude, Context context) {
+        TrafficResponse(double latitude, double longitude) {
             this.latitude = latitude;
             this.longitude = longitude;
-            this.context = context;
-            calculateBounds(33.424564, -111.928001);
+//            this.context = context;
+            calculateBounds(latitude, longitude);
 
         }
 
@@ -388,5 +409,100 @@ public class DatabaseController extends SQLiteOpenHelper {
             DatabaseController.this.databaseHandler.post(DatabaseController.this.addMusicDataToQueue);
         }
     }
+
+    private class SpeedometerResponse extends AsyncTask<String, String, String> implements IBaseGpsListener{
+
+        public MainActivity parentActivity;
+        TrackGPS gps;
+        public Context context;
+        public float currentSpeed;
+
+        public SpeedometerResponse(MainActivity parentActivity, TrackGPS gps, Context context) {
+            this.parentActivity = parentActivity;
+            this.gps = gps;
+            this.context = context;
+        }
+
+        private void updateSpeed(CLocation location) {
+            // TODO Auto-generated method stub
+            float nCurrentSpeed = 0;
+
+            if(location != null)
+            {
+                location.setUseMetricunits(this.useMetricUnits());
+                currentSpeed = location.getSpeed();
+            }
+
+
+
+        }
+
+        private boolean useMetricUnits() {
+            // TODO Auto-generated method stub
+            return true;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            float speedTest = 0;
+            this.updateSpeed(null);
+            for(int i = 0; i < 10; i++) {
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                criteria.setPowerRequirement(Criteria.POWER_LOW);
+
+                String best = this.gps.locationManager.getBestProvider(criteria, true);
+                this.updateSpeed(new CLocation(this.gps.locationManager.getLastKnownLocation(best)));
+
+                Log.w("Speed -> ", String.valueOf(currentSpeed));
+                speedTest += currentSpeed;
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return String.valueOf(speedTest/10);
+        }
+
+        @Override
+        public void onPostExecute(String speed) {
+            super.onPostExecute(speed);
+            SpeedInfo speedInfo = new SpeedInfo(speed);
+            String drivingStyleQueryType = "driving";
+            String drivingStyleParams = speedInfo.getDrivingStyle();
+            queryDatabaseController(drivingStyleQueryType, drivingStyleParams);
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+            if(location != null)
+            {
+                CLocation myLocation = new CLocation(location, this.useMetricUnits());
+                this.updateSpeed(myLocation);
+            }
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onGpsStatusChanged(int event) {
+
+        }
+    }
+
 
 }

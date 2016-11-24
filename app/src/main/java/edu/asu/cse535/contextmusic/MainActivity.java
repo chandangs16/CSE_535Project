@@ -2,12 +2,17 @@ package edu.asu.cse535.contextmusic;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Criteria;
+import android.location.LocationManager;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,7 +22,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
 import java.sql.SQLException;
+
+import static java.lang.Thread.sleep;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,42 +39,51 @@ public class MainActivity extends AppCompatActivity {
 
     public DatabaseController dbController;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setPermissions();
 
-        dbController = new DatabaseController(MainActivity.this, getApplicationContext());
+        gps = new TrackGPS(MainActivity.this);
+        dbController = new DatabaseController(MainActivity.this, getApplicationContext(), gps);
 
-        b_get = (Button)findViewById(R.id.get_Loc);
+        b_get = (Button) findViewById(R.id.get_Loc);
         b_get.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 // Start GPS Service.
-                gps = new TrackGPS(MainActivity.this);
+
                 Toast.makeText(MainActivity.this, "listener", Toast.LENGTH_SHORT).show();
 
-                if(gps.canGetLocation()){
+
+                if (gps.canGetLocation()) {
                     Toast.makeText(MainActivity.this, "inside if", Toast.LENGTH_SHORT).show();
                     longitude = gps.getLongitude();
-                    latitude = gps .getLatitude();
+                    latitude = gps.getLatitude();
 
                     Log.w("coord -> ", "Latitude ->" + latitude + " Longitude -> " + longitude);
-                    Toast.makeText(getApplicationContext(),"Longitude:"+Double.toString(longitude) + "\nLatitude:"+Double.toString(latitude),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
 
+                    dbController.addSong(gps.getLatitude(), gps.getLongitude());
                     // Start Weather Response Service.
                     new WeatherResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
 
                     // Start Traffic response Service.
                     new TrafficResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
+
+                    //new SpeedometerResponse(MainActivity.this, gps, getApplicationContext()).execute();
+
+
                 }
                 else
                 {
                     Log.w("gps: ","in else part");
                     gps.showSettingsAlert();
                 }
+
             }
         });
 
@@ -78,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     @Override
@@ -115,4 +133,6 @@ public class MainActivity extends AppCompatActivity {
                     3);
         }
     }
+
+
 }

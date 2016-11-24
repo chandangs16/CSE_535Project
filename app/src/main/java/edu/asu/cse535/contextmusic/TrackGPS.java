@@ -56,7 +56,7 @@ public class TrackGPS extends Service implements LocationListener {
         getLocation();
     }
 
-    private Location getLocation() {
+    public Location getLocation() {
 
         try {
             locationManager = (LocationManager) mContext
@@ -204,5 +204,6 @@ public class TrackGPS extends Service implements LocationListener {
     public void onProviderDisabled(String s) {
 
     }
+
 
 }
