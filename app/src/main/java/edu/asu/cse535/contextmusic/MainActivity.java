@@ -1,6 +1,7 @@
 package edu.asu.cse535.contextmusic;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     TrafficInfo trafficInfo;
 
     public DatabaseController dbController;
+    private String emotion = "";
 
 
     @Override
@@ -45,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setPermissions();
+
+        callemotion();
 
         gps = new TrackGPS(MainActivity.this);
         dbController = new DatabaseController(MainActivity.this, getApplicationContext(), gps);
@@ -91,13 +95,62 @@ public class MainActivity extends AppCompatActivity {
         b_emo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    // Set the Code for Emotion Prompt.
+                callemotion();
 
             }
         });
 
     }
 
+
+
+    public void callemotion() {
+        final Dialog dialog = new Dialog(MainActivity.this);
+        dialog.setContentView(R.layout.custom_dialogue);
+        dialog.setTitle("Title...");
+
+        // set the custom dialog components - text, image and button
+
+        Button dialogButtonHappy = (Button) dialog.findViewById(R.id.dialogButtonHappy);
+        // if button is clicked, close the custom dialog
+        dialogButtonHappy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emotion = "happy";
+                dialog.dismiss();
+            }
+        });
+        Button dialogButtonSad = (Button) dialog.findViewById(R.id.dialogButtonSad);
+        // if button is clicked, close the custom dialog
+        dialogButtonSad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emotion = "sad";
+                dialog.dismiss();
+            }
+        });
+        Button dialogButtonLazy = (Button) dialog.findViewById(R.id.dialogButtonLazy);
+        // if button is clicked, close the custom dialog
+        dialogButtonLazy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emotion = "lazy";
+                dialog.dismiss();
+            }
+        });
+        Button dialogButtonActive = (Button) dialog.findViewById(R.id.dialogButtonActive);
+        // if button is clicked, close the custom dialog
+        dialogButtonActive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                emotion = "active";
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

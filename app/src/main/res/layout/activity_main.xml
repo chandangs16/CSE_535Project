@@ -27,5 +27,6 @@
         android:id="@+id/get_Emo"
         android:layout_alignTop="@+id/get_Loc"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="71dp" />
+        android:layout_marginTop="71dp"
+        />
 </RelativeLayout>
