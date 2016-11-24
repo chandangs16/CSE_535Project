@@ -27,9 +27,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,7 +59,7 @@ public class DatabaseController extends SQLiteOpenHelper {
     private MainActivity parentActivity;
     private TrackGPS gps;
     private ArrayList<String> choiceList = new ArrayList<>();
-    public ConcurrentLinkedQueue<String> musicFiles = new ConcurrentLinkedQueue<String>();
+    public ConcurrentLinkedQueue<String> musicQueue = new ConcurrentLinkedQueue<String>();
     private String emotion = "happy";
     double longitude;
     double latitude;
@@ -80,12 +78,12 @@ public class DatabaseController extends SQLiteOpenHelper {
         public void run() {
             // TODO Auto-generated method stub
             Log.v("Thread -Check", "Running the Thread - Sohan");
-            //musicFiles.add("FirstFile");
-            //musicFiles.add("SecondFile");
+            //musicQueue.add("FirstFile");
+            //musicQueue.add("SecondFile");
             Random random = new Random();
             int randomIndex = random.nextInt(choiceList.size());
-            musicFiles.add(choiceList.get(randomIndex));
-            Log.w("music queue -> " , musicFiles.peek() + "~~~~" + musicFiles.size());
+            musicQueue.add(choiceList.get(randomIndex));
+            Log.w("music queue -> " , musicQueue.peek() + "~~~~" + musicQueue.size());
             choiceList = new ArrayList<>();
         }
     };
@@ -98,11 +96,16 @@ public class DatabaseController extends SQLiteOpenHelper {
         dbContext = context;
         dbPath = context.getFilesDir().getPath()+"/";
         android.util.Log.d(this.getClass().getSimpleName(),"dbpath: " + dbPath);
+        musicQueue.add("second");
 
         this.parentActivity = parentActivity;
         this.gps = gps;
 //        new WeatherResponse(latitude, longitude).execute();
 //        new TrafficResponse(latitude, longitude).execute();
+    }
+
+    public ConcurrentLinkedQueue<String> getQueue() {
+        return musicQueue;
     }
 
     /**
@@ -201,8 +204,6 @@ public class DatabaseController extends SQLiteOpenHelper {
         new WeatherResponse(latitude, longitude).execute();
         new TrafficResponse(latitude, longitude).execute();
     }
-
-
 
     public void queryDatabaseController(String queryType, String params) {
 //        ArrayList<String> songList = new ArrayList<String>();

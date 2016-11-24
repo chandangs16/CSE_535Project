@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
     public DatabaseController dbController;
     private String emotion = "";
+    private MusicService musicSrv;
+    private Intent playIntent;
+    private boolean musicBound = false;
 
 
     @Override
@@ -81,17 +84,15 @@ public class MainActivity extends AppCompatActivity {
                     //new SpeedometerResponse(MainActivity.this, gps, getApplicationContext()).execute();
 
 
-                }
-                else
-                {
-                    Log.w("gps: ","in else part");
+                } else {
+                    Log.w("gps: ", "in else part");
                     gps.showSettingsAlert();
                 }
 
             }
         });
 
-        b_emo = (Button)findViewById(R.id.get_Emo);
+        b_emo = (Button) findViewById(R.id.get_Emo);
         b_emo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
 
 
     public void callemotion() {
@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
 
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -186,6 +187,41 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET},
                     3);
         }
+    }
+
+    public void play(View v) {
+
+        musicSrv.startMusic(dbController.getQueue());
+        dbController.addSong(gps.getLatitude(),gps.getLongitude());
+    }
+
+    public void next(View v) {
+        musicSrv.nextMusic(dbController.getQueue());
+        dbController.addSong(gps.getLatitude(),gps.getLongitude());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        playIntent = new Intent(this, MusicService.class);
+        ServiceConnection musicConnection = new ServiceConnection() {
+
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+                //get service
+                musicSrv = binder.getService();
+                //pass list
+                musicBound = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                musicBound = false;
+            }
+        };
+        bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+        startService(playIntent);
     }
 
 
