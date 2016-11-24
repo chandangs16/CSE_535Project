@@ -62,7 +62,7 @@ public class DatabaseController extends SQLiteOpenHelper {
     private TrackGPS gps;
     private ArrayList<String> choiceList = new ArrayList<>();
     public ConcurrentLinkedQueue<String> musicFiles = new ConcurrentLinkedQueue<String>();
-
+    private String emotion = "happy";
     double longitude;
     double latitude;
 
@@ -89,6 +89,7 @@ public class DatabaseController extends SQLiteOpenHelper {
             choiceList = new ArrayList<>();
         }
     };
+
 
     // Constructors
     public DatabaseController(MainActivity parentActivity, Context context, TrackGPS gps) {
@@ -195,6 +196,7 @@ public class DatabaseController extends SQLiteOpenHelper {
     }
 
     public void addSong(double latitude, double longitude) {
+        emotionalResponse();
         new SpeedometerResponse(this.parentActivity, this.gps, this.parentActivity.getApplicationContext()).execute();
         new WeatherResponse(latitude, longitude).execute();
         new TrafficResponse(latitude, longitude).execute();
@@ -502,6 +504,15 @@ public class DatabaseController extends SQLiteOpenHelper {
         public void onGpsStatusChanged(int event) {
 
         }
+    }
+
+    public void addEmotion(String emotion)  {
+        this.emotion = emotion;
+    }
+
+    public void emotionalResponse() {
+        String emotionQuery = "emotion";
+        queryDatabaseController(emotionQuery, this.emotion);
     }
 
 

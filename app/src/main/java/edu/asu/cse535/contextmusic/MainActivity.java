@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         gps = new TrackGPS(MainActivity.this);
         dbController = new DatabaseController(MainActivity.this, getApplicationContext(), gps);
-
+        dbController.addEmotion(this.emotion);
         b_get = (Button) findViewById(R.id.get_Loc);
         b_get.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 callemotion();
+                dbController.addEmotion(MainActivity.this.emotion);
 
             }
         });
