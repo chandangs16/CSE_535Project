@@ -38,7 +38,7 @@ public class WeatherInfo {
                 case "Fog":
                     this.weather = "fog";
                     break;
-                default: this.weather = "";
+                default: this.weather = "sunny";
                     break;
             };
 

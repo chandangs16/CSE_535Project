@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent" >
+
+<Button
+    android:id="@+id/dialogButtonHappy"
+    android:layout_width="200px"
+    android:layout_height="200px"
+    android:layout_marginTop="5dp"
+    android:layout_marginRight="5dp"
+    android:background="@drawable/happy"
+    />
+    <Button
+        android:id="@+id/dialogButtonSad"
+        android:layout_width="200px"
+        android:layout_height="200px"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/sad"
+        />
+    <Button
+        android:id="@+id/dialogButtonLazy"
+        android:layout_width="200px"
+        android:layout_height="200px"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/lazy"
+        />
+    <Button
+        android:id="@+id/dialogButtonActive"
+        android:layout_width="200px"
+        android:layout_height="200px"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/active"
+        />
+</LinearLayout>
