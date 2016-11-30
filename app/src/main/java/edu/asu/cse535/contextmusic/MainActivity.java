@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setPermissions();
+        verifyStoragePermissions(this);
 
         callemotion();
 
@@ -62,32 +63,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 // Start GPS Service.
-
-                Toast.makeText(MainActivity.this, "listener", Toast.LENGTH_SHORT).show();
-
-
-                if (gps.canGetLocation()) {
-                    Toast.makeText(MainActivity.this, "inside if", Toast.LENGTH_SHORT).show();
-                    longitude = gps.getLongitude();
-                    latitude = gps.getLatitude();
-
-                    Log.w("coord -> ", "Latitude ->" + latitude + " Longitude -> " + longitude);
-                    Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
-
-                    dbController.addSong(gps.getLatitude(), gps.getLongitude());
-                    // Start Weather Response Service.
-                    new WeatherResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
-
-                    // Start Traffic response Service.
-                    new TrafficResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
-
-                    //new SpeedometerResponse(MainActivity.this, gps, getApplicationContext()).execute();
-
-
-                } else {
-                    Log.w("gps: ", "in else part");
-                    gps.showSettingsAlert();
-                }
+                setDefaults();
 
             }
         });
@@ -104,6 +80,33 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void setDefaults() {
+
+        //Toast.makeText(MainActivity.this, "listener", Toast.LENGTH_SHORT).show();
+
+
+        if (gps.canGetLocation()) {
+            //Toast.makeText(MainActivity.this, "inside if", Toast.LENGTH_SHORT).show();
+            longitude = gps.getLongitude();
+            latitude = gps.getLatitude();
+
+            Log.w("coord -> ", "Latitude ->" + latitude + " Longitude -> " + longitude);
+            //Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
+
+            // Start Weather Response Service.
+            new WeatherResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
+
+            // Start Traffic response Service.
+            new TrafficResponse(MainActivity.this, latitude, longitude, getApplicationContext()).execute();
+
+            //new SpeedometerResponse(MainActivity.this, gps, getApplicationContext()).execute();
+
+
+        } else {
+            Log.w("gps: ", "in else part");
+            gps.showSettingsAlert();
+        }
+    }
 
     public void callemotion() {
         final Dialog dialog = new Dialog(MainActivity.this);
@@ -190,14 +193,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void play(View v) {
-
+        setDefaults();
+        dbController.addSong(gps.getLatitude(), gps.getLongitude());
+        v.setVisibility(View.GONE);
+        View pauseBtn = (findViewById(R.id.button_pause));
+        pauseBtn.setVisibility(View.VISIBLE);
         musicSrv.startMusic(dbController.getQueue());
         dbController.addSong(gps.getLatitude(),gps.getLongitude());
     }
 
+    public void pause(View v) {
+        v.setVisibility(View.GONE);
+        View playBtn = (findViewById(R.id.button_play));
+        playBtn.setVisibility(View.VISIBLE);
+        musicSrv.pauseMusic();
+    }
+
     public void next(View v) {
-        musicSrv.nextMusic(dbController.getQueue());
         dbController.addSong(gps.getLatitude(),gps.getLongitude());
+        musicSrv.nextMusic(dbController.getQueue());
+
     }
 
     @Override
@@ -222,6 +237,34 @@ public class MainActivity extends AppCompatActivity {
         };
         bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
         startService(playIntent);
+    }
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(MainActivity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
 
 

@@ -9,7 +9,7 @@ android:layout_height="fill_parent" >
     android:layout_height="200px"
     android:layout_marginTop="5dp"
     android:layout_marginRight="5dp"
-    android:background="@drawable/happy"
+    android:background="@drawable/icon_happy"
     />
     <Button
         android:id="@+id/dialogButtonSad"
@@ -17,7 +17,7 @@ android:layout_height="fill_parent" >
         android:layout_height="200px"
         android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
-        android:background="@drawable/sad"
+        android:background="@drawable/icon_sad"
         />
     <Button
         android:id="@+id/dialogButtonLazy"
@@ -25,7 +25,7 @@ android:layout_height="fill_parent" >
         android:layout_height="200px"
         android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
-        android:background="@drawable/lazy"
+        android:background="@drawable/icon_lazy"
         />
     <Button
         android:id="@+id/dialogButtonActive"
@@ -33,6 +33,6 @@ android:layout_height="fill_parent" >
         android:layout_height="200px"
         android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
-        android:background="@drawable/active"
+        android:background="@drawable/icon_active"
         />
 </LinearLayout>

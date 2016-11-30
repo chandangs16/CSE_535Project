@@ -31,23 +31,41 @@
         />
 
     <Button
-        android:text="play music"
+        android:drawableTop="@drawable/icon_next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/get_Emo"
-        android:layout_alignEnd="@+id/get_Loc"
-        android:layout_marginTop="37dp"
-        android:id="@+id/button"
-        android:onClick="play"/>
+        android:id="@+id/button2"
+        android:onClick="next"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/button_dummy" />
 
     <Button
-        android:text="nexy"
+        android:drawableTop="@drawable/icon_pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/button"
-        android:layout_alignStart="@+id/button"
-        android:layout_marginTop="25dp"
-        android:id="@+id/button2"
-        android:onClick="next"/>
+        android:visibility="invisible"
+        android:id="@+id/button_pause"
+        android:onClick="pause"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/get_Loc" />
+
+    <Button
+        android:drawableTop="@drawable/icon_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:id="@+id/button_dummy"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/get_Loc" />
+
+    <Button
+        android:drawableTop="@drawable/icon_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:id="@+id/button_play"
+        android:onClick="play"
+        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@+id/get_Loc" />
 
 </RelativeLayout>

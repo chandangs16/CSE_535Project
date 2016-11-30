@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -96,7 +97,7 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
         // Initial Code.
         super.onPostExecute(strJsonObj);
         this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
-        System.out.println(this.parentActivity.trafficInfo.toJsonString());
+        Log.w("Traffic Data", this.parentActivity.trafficInfo.toJsonString());
         Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
 
         this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
