@@ -7,5 +7,36 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <style name="CustomMorningTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/MorningTheme</item>
+        <item name="colorPrimaryDark">#1565C0</item>item
+        <item name="android:statusBarColor">#1565C0</item>
+    </style>
+    <style name="MorningTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:background">#1565C0</item>
+    </style>
+    <style name="CustomAfternoonTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/AfternoonTheme</item>
+        <item name="colorPrimaryDark">#FFF176</item>
+        <item name="android:statusBarColor">#FFF176</item>
+    </style>
+    <style name="AfternoonTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:background">#FFF176</item>
+    </style>
+    <style name="CustomEveningTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/EveningTheme</item>
+        <item name="colorPrimaryDark">#E0E0E0</item>
+        <item name="android:statusBarColor">#E0E0E0</item>
+    </style>
+    <style name="EveningTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:background">#E0E0E0</item>
+    </style>
+    <style name="CustomNightTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/NightTheme</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="android:statusBarColor">#000000</item>
+    </style>
+    <style name="NightTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:background">#000000</item>
+    </style>
 </resources>

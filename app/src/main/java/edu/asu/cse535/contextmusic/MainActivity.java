@@ -10,6 +10,8 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.Handler;
@@ -21,10 +23,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 
 import static java.lang.Thread.sleep;
 
@@ -37,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     double latitude;
     WeatherInfo weatherInfo;
     TrafficInfo trafficInfo;
+    Calendar c = Calendar.getInstance();
+    int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
 
     public DatabaseController dbController;
     private String emotion = "";
@@ -200,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
         pauseBtn.setVisibility(View.VISIBLE);
         musicSrv.startMusic(dbController.getQueue());
         dbController.addSong(gps.getLatitude(),gps.getLongitude());
+        setTheme();
     }
 
     public void pause(View v) {
@@ -212,6 +220,11 @@ public class MainActivity extends AppCompatActivity {
     public void next(View v) {
         dbController.addSong(gps.getLatitude(),gps.getLongitude());
         musicSrv.nextMusic(dbController.getQueue());
+        View playBtn = (findViewById(R.id.button_play));
+        playBtn.setVisibility(View.GONE);
+        View pauseBtn = (findViewById(R.id.button_pause));
+        pauseBtn.setVisibility(View.VISIBLE);
+        setTheme();
 
     }
 
@@ -266,6 +279,79 @@ public class MainActivity extends AppCompatActivity {
             );
         }
     }
+
+    public void setTheme() {
+        String time ="Morning";
+        Window window;
+        if (timeOfDay >= 0 && timeOfDay < 12) {
+            time = "Morning";
+        } else if (timeOfDay >= 12 && timeOfDay < 16) {
+            time = "Afternoon";
+        } else if (timeOfDay >= 16 && timeOfDay < 21) {
+            time = "Evening";
+        } else if (timeOfDay >= 21 && timeOfDay < 24) {
+            time = "Night";
+        }
+
+
+        switch(time){
+            case "Morning": this.setTheme(R.style.CustomMorningTheme);
+                this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1565C0")));
+                window = this.getWindow();
+
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+                // finally change the color
+                window.setStatusBarColor(this.getResources().getColor(R.color.Morning));
+
+                break;
+            case "Afternoon": this.setTheme(R.style.CustomAfternoonTheme);
+                this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFF176")));
+                window = this.getWindow();
+
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+                // finally change the color
+                window.setStatusBarColor(this.getResources().getColor(R.color.Afternoon));
+                break;
+            case "Evening": this.setTheme(R.style.CustomEveningTheme);
+                this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#E0E0E0")));
+                window = this.getWindow();
+
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+                // finally change the color
+                window.setStatusBarColor(this.getResources().getColor(R.color.Evening));
+                break;
+            default: this.setTheme(R.style.CustomNightTheme);
+                this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#000000")));
+                window = this.getWindow();
+
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+                // finally change the color
+                window.setStatusBarColor(this.getResources().getColor(R.color.Night));
+                break;
+        }
+    }
+
+
 
 
 }
