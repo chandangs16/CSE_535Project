@@ -98,18 +98,18 @@ public class TrafficResponse extends AsyncTask<String, String, String> {
         super.onPostExecute(strJsonObj);
         this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
         Log.w("Traffic Data", this.parentActivity.trafficInfo.toJsonString());
-        Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic, Toast.LENGTH_SHORT).show();
 
         this.parentActivity.trafficInfo = new TrafficInfo(strJsonObj);
         System.out.println(this.parentActivity.trafficInfo.toJsonString());
-        Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic.toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Traffic: " + this.parentActivity.trafficInfo.traffic, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         PendingIntent pendingIntent = PendingIntent.getActivity(parentActivity,0,intent,0);
         android.support.v4.app.NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(parentActivity.getApplicationContext())
                         .setSmallIcon(R.drawable.traffic)
                         .setContentTitle("Traffic")
-                        .setContentText(parentActivity.trafficInfo.traffic.toString().toUpperCase());
+                        .setContentText(parentActivity.trafficInfo.traffic);
 
         mBuilder.setContentIntent(pendingIntent);
 

@@ -49,7 +49,7 @@ public class TrafficInfo {
                 traffic = "traffic jam";
             }
             else{
-                traffic = null;
+                traffic = "free road";
             }
 
         } catch (JSONException e) {
